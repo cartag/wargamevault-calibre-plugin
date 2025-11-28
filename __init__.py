@@ -21,7 +21,7 @@ class WarGameVault(Source):
 
     name                    = 'WarGameVault'
     description             = 'Downloads metadata from wargamevault.com'
-    author                  = 'quickwick'
+    author                  = 'cartag'
     version                 = (1, 0, 0)
     minimum_calibre_version = (8, 6, 0)
 
