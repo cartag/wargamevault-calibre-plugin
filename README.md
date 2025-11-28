@@ -8,7 +8,7 @@ For increased speed while populating your TTRPG book metadata into Calibre, I re
 
 WarGameVault search isn't great. I find it's often easier to just tell the plugin which exact item it is. You do this by adding adding "wargamevault:[id#]" into the "Ids" field in the Calibre item metadata. For example, for https://www.drivethrurpg.com/en/product/345698/stargrave-science-fiction-wargames-in-the-ravaged-galaxy you would put "wargamevault:345698" into the Ids field (without the quotes, of course). You get the Id from the product URL.
 
-If you don't want to manually enter Ids and prefer to try your luck with search, I *highly* recommend enabling the Calibre option "Keep more than one entry per source" in the "Configure Metadata download" window. Otherwise it will only show you the first search result from DriveThruRPG, which will *often* be wrong.
+If you don't want to manually enter Ids and prefer to try your luck with search, I *highly* recommend enabling the Calibre option "Keep more than one entry per source" in the "Configure Metadata download" window. Otherwise it will only show you the first search result from WarGameVault, which will *often* be wrong.
 
 ## Main Features
 
