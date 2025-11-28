@@ -146,7 +146,7 @@ class WarGameVault(Source):
         log.info('Found %r matches in the query results'%(len(matches)))
         #log.info('Matches: %r'%matches)
 
-        from calibre_plugins.WarGameVault.worker import Worker
+        from calibre_plugins.wargamevault.worker import Worker
         workers = [Worker(url, result_queue, br, log, i, self) for i, url in
                 enumerate(matches)]
 
