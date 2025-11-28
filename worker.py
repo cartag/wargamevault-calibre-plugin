@@ -10,12 +10,12 @@ from threading import Thread
 
 from calibre.ebooks.metadata.book.base import Metadata
 
-import calibre_plugins.drivethrurpg.config as cfg
+import calibre_plugins.wargamevault.config as cfg
 
 class Worker(Thread): # Get details
 
     '''
-    Get book details from DriveThruRPG book page in a separate thread
+    Get book details from WarGameVault book page in a separate thread
     '''
 
     def __init__(self, url, result_queue, browser, log, relevance, plugin, timeout=20):
@@ -25,7 +25,7 @@ class Worker(Thread): # Get details
         self.log, self.timeout = log, timeout
         self.relevance, self.plugin = relevance, plugin
         self.browser = browser.clone_browser()
-        self.cover_url = self.drivethrurpg_id = self.isbn = None
+        self.cover_url = self.wargamevault_id = self.isbn = None
 
     def run(self):
         try:
@@ -36,7 +36,7 @@ class Worker(Thread): # Get details
     def get_details(self):
         self.log.info('Starting the get_details method')
         try:
-            self.log.info('DriveThruRPG product url: %r'%self.url)
+            self.log.info('WarGameVault product url: %r'%self.url)
             self.browser.set_handle_redirect(True)
             self.browser.set_debug_redirects(True)
             import logging
@@ -52,7 +52,7 @@ class Worker(Thread): # Get details
             attr = getattr(e, 'args', [None])
             attr = attr if attr else [None]
             if isinstance(attr[0], socket.timeout):
-                msg = 'DriveThruRPG timed out. Try again later.'
+                msg = 'WarGameVault timed out. Try again later.'
                 self.log.error(msg)
             else:
                 msg = 'Failed to make details query: %r'%self.url
@@ -70,7 +70,7 @@ class Worker(Thread): # Get details
             data = json.loads(raw)
             #self.log.info(data)
         except:
-            msg = 'Failed to parse DriveThruRPG product page: %r'%self.url
+            msg = 'Failed to parse WarGameVault product page: %r'%self.url
             self.log.exception(msg)
             return
 
@@ -79,7 +79,7 @@ class Worker(Thread): # Get details
             # the JSON for a book
             name = data['data']['attributes']['description']['name']
         except:
-            msg = 'Failed to find DriveThruRPG product name in JSON data: %r'%self.url
+            msg = 'Failed to find WarGameVault product name in JSON data: %r'%self.url
             self.log.exception(msg)
             return
 
@@ -89,11 +89,11 @@ class Worker(Thread): # Get details
         self.log.info('Started the parse_details process')
 
         try:
-            drivethrurpg_id = self.parse_drivethrurpg_id(self.url)
-            self.log.info('Parsed DriveThruRPG id of %r for url: %r'%(drivethrurpg_id,self.url))
+            wargamevault_id = self.parse_wargamevault_id(self.url)
+            self.log.info('Parsed WarGameVault id of %r for url: %r'%(wargamevault_id,self.url))
         except:
-            self.log.exception('Error parsing DriveThruRPG id for url: %r'%self.url)
-            drivethrurpg_id = None
+            self.log.exception('Error parsing WarGameVault id for url: %r'%self.url)
+            wargamevault_id = None
 
         try:
             title = self.parse_title(data)
@@ -107,15 +107,15 @@ class Worker(Thread): # Get details
             self.log.exception('Error parsing authors for url: %r'%self.url)
             authors = []
 
-        if not title or not authors or not drivethrurpg_id:
-            self.log.error('Could not find title/authors/drivethrurpg id for %r'%self.url)
-            self.log.error('DriveThruRPG: %r Title: %r Authors: %r'%(drivethrurpg_id, title,
+        if not title or not authors or not wargamevault_id:
+            self.log.error('Could not find title/authors/wargamevault id for %r'%self.url)
+            self.log.error('WarGameVault: %r Title: %r Authors: %r'%(wargamevault_id, title,
                 authors))
             return
 
         mi = Metadata(title, authors)
-        mi.set_identifier('drivethrurpg', drivethrurpg_id)
-        self.drivethrurpg_id = drivethrurpg_id
+        mi.set_identifier('wargamevault', wargamevault_id)
+        self.wargamevault_id = wargamevault_id
 
         try:
             isbn = self.parse_isbn(data)
@@ -154,18 +154,18 @@ class Worker(Thread): # Get details
 
         mi.source_relevance = self.relevance
 
-        if self.drivethrurpg_id:
+        if self.wargamevault_id:
             if self.isbn:
-                self.plugin.cache_isbn_to_identifier(self.isbn, self.drivethrurpg_id)
+                self.plugin.cache_isbn_to_identifier(self.isbn, self.wargamevault_id)
             if self.cover_url:
-                self.plugin.cache_identifier_to_cover_url(self.drivethrurpg_id, self.cover_url)
+                self.plugin.cache_identifier_to_cover_url(self.wargamevault_id, self.cover_url)
 
         self.plugin.clean_downloaded_metadata(mi)
 
         self.log.info('Adding Metadata item to result_queue')
         self.result_queue.put(mi)
 
-    def parse_drivethrurpg_id(self, url):
+    def parse_wargamevault_id(self, url):
         return re.search(r'/products/(\d*)', url).groups(0)[0]
 
     def parse_title(self, data):
@@ -177,7 +177,7 @@ class Worker(Thread): # Get details
         return title.replace('>','').strip()
 
     def parse_authors(self, data):
-        # DriveThruRPG has multiple contributor categories
+        # WarGameVault has multiple contributor categories
         # which can be included as Authors depending on the user's preference.
         get_artists = cfg.plugin_prefs[cfg.STORE_NAME].get(cfg.KEY_GET_ARTISTS_AS_AUTHORS)
         get_editors = cfg.plugin_prefs[cfg.STORE_NAME].get(cfg.KEY_GET_EDITORS_AS_AUTHORS)
@@ -229,7 +229,7 @@ class Worker(Thread): # Get details
                 return publisher
 
     def parse_tags(self, data):
-        # DriveThruRPG has multiple optional sections which can be used as tags depending on the user's preference.
+        # WarGameVault has multiple optional sections which can be used as tags depending on the user's preference.
         calibre_tags = []
         get_category = cfg.plugin_prefs[cfg.STORE_NAME].get(cfg.KEY_GET_CATEGORY_AS_TAGS)
         get_filter = cfg.plugin_prefs[cfg.STORE_NAME].get(cfg.KEY_GET_FILTER_AS_TAGS)
