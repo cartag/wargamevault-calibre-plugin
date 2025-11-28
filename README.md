@@ -19,4 +19,4 @@ If you don't want to manually enter Ids and prefer to try your luck with search,
 
 ## Development / Contributions
 
-This plugin started out life as a copy of the FictionDB plugin (https://github.com/kiwidude68/calibre_plugins), was mangled into pulling data from the DriveThruRPG API by a Python n00b, and then shamelessly ripped off to pull from WarGameVault by a nerd.
+This plugin started out life as a copy of the FictionDB plugin (https://github.com/kiwidude68/calibre_plugins), was mangled into pulling data from the DriveThruRPG API by a Python n00b (https://github.com/quickwick/drivethrurpg-calibre-plugin), and then shamelessly ripped off to pull from WarGameVault by a nerd.
