@@ -214,17 +214,17 @@ if __name__ == '__main__': # tests
         [
 
             ( # A book with a WarGameVault id
-                {'identifiers':{'WarGameVault': '404243'}},
+                {'identifiers':{'wargamevault': '457226'}},
                     #'title':'Shadow of the Weird Wizard', 'authors':['Robert J Schwalb']},
-                [title_test('Space Station Zero',
-                    exact=True), authors_test(['Adam Loper'])]
+                [title_test('Shadow of the Weird Wizard',
+                    exact=True), authors_test(['Robert J Schwalb'])]
 
             ),
 
             ( # A book with no id specified
-                {'title':"Space Station Zero", 'authors':['Adam Loper']},
-                [title_test("Space Station Zero",
-                    exact=True), authors_test(['Adam Loper'])]
+                {'title':"Secrets of the Weird Wizard", 'authors':['Robert J. Schwalb']},
+                [title_test("Secrets of the Weird Wizard",
+                    exact=True), authors_test(['Robert J. Schwalb'])]
 
             ),
 
