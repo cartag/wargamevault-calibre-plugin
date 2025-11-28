@@ -31,7 +31,7 @@ DEFAULT_STORE_VALUES = {
 }
 
 # This is where all preferences for this plugin will be stored
-plugin_prefs = JSONConfig('plugins/DriveThruRPG')
+plugin_prefs = JSONConfig('plugins/WarGameVault')
 
 # Set defaults
 plugin_prefs.defaults[STORE_NAME] = DEFAULT_STORE_VALUES
