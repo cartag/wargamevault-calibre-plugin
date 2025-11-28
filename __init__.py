@@ -17,45 +17,45 @@ except ImportError:
 from calibre import as_unicode
 from calibre.ebooks.metadata.sources.base import Source
 
-class DriveThruRPG(Source):
+class WarGameVault(Source):
 
-    name                    = 'DriveThruRPG'
-    description             = 'Downloads metadata from drivethrurpg.com'
+    name                    = 'WarGameVault'
+    description             = 'Downloads metadata from wargamevault.com'
     author                  = 'quickwick'
     version                 = (1, 0, 0)
     minimum_calibre_version = (8, 6, 0)
 
-    ID_NAME = 'drivethrurpg'
+    ID_NAME = 'wargamevault'
     capabilities = frozenset(['identify', 'cover'])
-    touched_fields = frozenset(['title', 'authors', 'identifier:drivethrurpg',
+    touched_fields = frozenset(['title', 'authors', 'identifier:wargamevault',
         'comments', 'publisher', 'pubdate', 'tags', 'series'])
     has_html_comments = True
     supports_gzip_transfer_encoding = True
 
-    BASE_URL = 'https://www.drivethrurpg.com'
-    BASE_API_URL = 'https://api.drivethrurpg.com/api/vBeta'
+    BASE_URL = 'https://www.wargamevault.com'
+    BASE_API_URL = 'https://api.wargamevault.com/api/vBeta'
 
     # This method is expected for a metadata source plugin
     def config_widget(self):
         '''
         Overriding the default configuration screen for our own custom configuration
         '''
-        from calibre_plugins.drivethrurpg.config import ConfigWidget
+        from calibre_plugins.wargamevault.config import ConfigWidget
         return ConfigWidget(self)
 
     # This method is expected for a metadata source plugin
     def get_book_url(self, identifiers):
-        drivethrurpg_id = identifiers.get(self.ID_NAME, None)
-        if drivethrurpg_id:
-            return (self.ID_NAME, drivethrurpg_id,
-                    '%s/product/%s'%(self.BASE_URL, drivethrurpg_id))
+        wargamevault_id = identifiers.get(self.ID_NAME, None)
+        if wargamevault_id:
+            return (self.ID_NAME, wargamevault_id,
+                    '%s/product/%s'%(self.BASE_URL, wargamevault_id))
 
     # This method is custom to this plugin
     def get_book_dl_url(self, identifiers):
-        drivethrurpg_id = identifiers.get(self.ID_NAME, None)
-        if drivethrurpg_id:
-            return (self.ID_NAME, drivethrurpg_id,
-                    '%s/products/%s'%(self.BASE_API_URL, drivethrurpg_id))
+        wargamevault_id = identifiers.get(self.ID_NAME, None)
+        if wargamevault_id:
+            return (self.ID_NAME, wargamevault_id,
+                    '%s/products/%s'%(self.BASE_API_URL, wargamevault_id))
 
     # This method is expected for a metadata source plugin
     def id_from_url(self, url):
@@ -67,13 +67,13 @@ class DriveThruRPG(Source):
     # This method is expected for a metadata source plugin
     def get_cached_cover_url(self, identifiers):
         url = None
-        drivethrurpg_id = identifiers.get(self.ID_NAME, None)
-        if drivethrurpg_id is None:
+        wargamevault_id = identifiers.get(self.ID_NAME, None)
+        if wargamevault_id is None:
             isbn = identifiers.get('isbn', None)
             if isbn is not None:
-                drivethrurpg_id = self.cached_isbn_to_identifier(isbn)
-        if drivethrurpg_id is not None:
-            url = self.cached_identifier_to_cover_url(drivethrurpg_id)
+                wargamevault_id = self.cached_isbn_to_identifier(isbn)
+        if wargamevault_id is not None:
+            url = self.cached_identifier_to_cover_url(wargamevault_id)
 
         return url
 
@@ -86,18 +86,18 @@ class DriveThruRPG(Source):
         match is found with identifiers.
         '''
         matches = []
-        # Unlike the other metadata sources, if we have a DriveThruRPG id then we
-        # do not need to fire a "search" at DriveThruRPG.com. Instead we will be
+        # Unlike the other metadata sources, if we have a WarGameVault id then we
+        # do not need to fire a "search" at WarGameVault.com. Instead we will be
         # able to go straight to the URL for that book.
-        drivethrurpg_id = identifiers.get(self.ID_NAME, None)
+        wargamevault_id = identifiers.get(self.ID_NAME, None)
 
         br = self.browser
 
-        if drivethrurpg_id:
-            log.info('Found a DriveThruRPG id of %s'%drivethrurpg_id)
+        if wargamevault_id:
+            log.info('Found a WarGameVault id of %s'%wargamevault_id)
             matches.append(self.get_book_dl_url(identifiers)[2])
         else:
-            # Search DriveThruRPG using the title
+            # Search WarGameVault using the title
             title_tokens = list(self.get_title_tokens(title,
                                 strip_joiners=True, strip_subtitle=True))
             title_text = ' '.join(title_tokens)
@@ -106,7 +106,7 @@ class DriveThruRPG(Source):
             query_params = parse.urlencode({'page':1,'pageSize':6,'groupId':1,'name':title_text,'order[matchWeight]':'desc',
                                       'siteId':10,'contentRating[lte]':1,'status':1,'partial':'false'},quote_via=parse.quote)
             #log.info('Constructed a urlencoded query_params string of %s'%query_params)
-            query_url = DriveThruRPG.BASE_API_URL + '/products?' + query_params
+            query_url = WarGameVault.BASE_API_URL + '/products?' + query_params
 
             if query_params is None:
                 log.error('Insufficient metadata to construct query')
@@ -115,7 +115,7 @@ class DriveThruRPG(Source):
                 log.info('Querying: %s'%query_url)
                 br.set_handle_redirect(True)
                 br.set_debug_redirects(True)
-                # Perform a product search on DriveThruRPG
+                # Perform a product search on WarGameVault
                 response = br.open_novisit(query_url, timeout=timeout)
                 #log.info('Received search response of : %s'%response)
             except Exception as e:
@@ -132,11 +132,11 @@ class DriveThruRPG(Source):
                     return
                 data = json.loads(raw)
                 for product in data['data']:
-                    product_url = DriveThruRPG.BASE_API_URL + '/products/' + str(product['attributes']['productId'])
+                    product_url = WarGameVault.BASE_API_URL + '/products/' + str(product['attributes']['productId'])
                     log.info('Identified product URL in search results: %s'%product_url)
                     matches.append(product_url)
             except:
-                msg = 'Failed to parse DriveThruRPG page for query: %s'%(query_url)
+                msg = 'Failed to parse WarGameVault page for query: %s'%(query_url)
                 log.exception(msg)
                 return msg
 
@@ -146,7 +146,7 @@ class DriveThruRPG(Source):
         log.info('Found %r matches in the query results'%(len(matches)))
         #log.info('Matches: %r'%matches)
 
-        from calibre_plugins.drivethrurpg.worker import Worker
+        from calibre_plugins.WarGameVault.worker import Worker
         workers = [Worker(url, result_queue, br, log, i, self) for i, url in
                 enumerate(matches)]
 
@@ -210,21 +210,21 @@ if __name__ == '__main__': # tests
     # calibre-debug -e __init__.py
     from calibre.ebooks.metadata.sources.test import (test_identify_plugin,
             title_test, authors_test)
-    test_identify_plugin(DriveThruRPG.name,
+    test_identify_plugin(WarGameVault.name,
         [
 
-            ( # A book with a DriveThruRPG id
-                {'identifiers':{'drivethrurpg': '457226'}},
+            ( # A book with a WarGameVault id
+                {'identifiers':{'WarGameVault': '404243'}},
                     #'title':'Shadow of the Weird Wizard', 'authors':['Robert J Schwalb']},
-                [title_test('Shadow of the Weird Wizard',
-                    exact=True), authors_test(['Robert J Schwalb'])]
+                [title_test('Space Station Zero',
+                    exact=True), authors_test(['Adam Loper'])]
 
             ),
 
             ( # A book with no id specified
-                {'title':"Secrets of the Weird Wizard", 'authors':['Robert J. Schwalb']},
-                [title_test("Secrets of the Weird Wizard",
-                    exact=True), authors_test(['Robert J. Schwalb'])]
+                {'title':"Space Station Zero", 'authors':['Adam Loper']},
+                [title_test("Space Station Zero",
+                    exact=True), authors_test(['Adam Loper'])]
 
             ),
 
